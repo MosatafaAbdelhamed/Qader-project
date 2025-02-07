@@ -28,8 +28,6 @@ Route::post('/login/volunteer' , [LoginControllerVol::class,'login_vol']);
 Route::post('/logout' , [LoginControllerVol::class,'logout'])->middleware('auth:sanctum');
 
 
-
-
 // Route::post('/password/email' , [PasswordResetController::class,'sendResetLinkEmail'])->middleware('auth:sanctum');
 // Route::post('/password/reset' , [PasswordResetController::class,'reset'])->name('password.reset')->middleware('signed');
 
@@ -39,4 +37,5 @@ Route::get('/categories', [CategoriesController::class, 'index']);
 Route::get('/opportunities', [OpportunitiesController::class, 'index']);
 Route::get('/search', [SearchController::class, 'search']);
 
+//
 Route::post('/organizations', [OrganizationController::class, 'index']);

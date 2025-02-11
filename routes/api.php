@@ -33,12 +33,13 @@ Route::post('/logout' , [LoginControllerVol::class,'logout'])->middleware('auth:
 
 
 Route::get('/home', [HomeController::class, 'index']);
+Route::get('/categories', [CategoriesController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/opportunities', [OpportunitiesController::class, 'index']);
     Route::get('/organizations', [OrganizationController::class, 'index']);
     Route::get('/search', [SearchController::class, 'search']);
-    Route::get('/categories', [CategoriesController::class, 'index']);
+
 });
 
 

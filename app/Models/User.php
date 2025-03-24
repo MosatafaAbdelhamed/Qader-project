@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -51,6 +52,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function sendPasswordResetNotification($token)
+    {
+        $url =  env('APP_URL') . '/api/reset-password/' . $token;
+
+        // $url = 'http://127.0.0.1:8000/api/reset-password?token=' . $token;
+
+        $this->notify(new ResetPassword($url));
+    }
+
     // علاقة مع الفرص: المستخدم يمكنه التقديم على العديد من الفرص
     public function opportunities()
     {

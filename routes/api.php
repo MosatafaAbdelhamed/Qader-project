@@ -28,18 +28,32 @@ Route::post('/login/volunteer' , [LoginControllerVol::class,'login_vol']);
 Route::post('/logout' , [LoginControllerVol::class,'logout'])->middleware('auth:sanctum');
 
 
-// Route::post('/password/email' , [PasswordResetController::class,'sendResetLinkEmail'])->middleware('auth:sanctum');
-// Route::post('/password/reset' , [PasswordResetController::class,'reset'])->name('password.reset')->middleware('signed');
-
-
 Route::get('/home', [HomeController::class, 'index']);
-Route::get('/categories', [CategoriesController::class, 'index']);
+Route::get('/categories', [CategoriesController::class, 'getCategories']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/opportunities', [OpportunitiesController::class, 'index']);
+    Route::get('/search-opportunities', [OpportunitiesController::class, 'search']);
+    //
     Route::get('/organizations', [OrganizationController::class, 'index']);
-    Route::get('/search', [SearchController::class, 'search']);
-
+    Route::get('/organizations/search', [OrganizationController::class, 'search']);
 });
+
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/my-opportunities', [OpportunitiesController::class, 'myOpportunities']);
+    Route::post('/opportunities', [OpportunitiesController::class, 'store']);
+    Route::put('/opportunities/{opportunity_id}', [OpportunitiesController::class, 'update']);
+    Route::delete('/opportunities/{opportunity_id}', [OpportunitiesController::class, 'destroy']);
+});
+
+//new updata
+Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('reset-password/{token}', [PasswordResetController::class, 'reset'])->middleware('guest')->name('password.update');
+
+Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('auth:sanctum');
+Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify')->middleware('auth:sanctum');
+
 
 

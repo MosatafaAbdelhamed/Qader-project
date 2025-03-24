@@ -7,15 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Opportunity extends Model
 {
-    //
+    use HasFactory;
 
-use HasFactory;
+    protected $table = 'opportunities';
+    protected $primaryKey = 'opportunity_id';
 
-    protected $fillable = ['title', 'description', 'category_id', 'user_id'];
+    protected $fillable = ['title', 'description', 'category_id', 'organization_id', 'start', 'end'];
 
-    // relationship users (الفرصة يمكن أن تحتوي على العديد من المتطوعين)
-    public function users()
+    public $timestamps = true;
+
+    public function category()
     {
-        return $this->belongsToMany(User::class, 'opportunity_user');
+        return $this->belongsTo(Category::class, 'category_id', 'category_id');
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organization_id', 'organization_id');
     }
 }

@@ -2,65 +2,76 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
+use App\Models\Organization;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-
 class LoginControllerOrg extends Controller
 {
-    //
-    //
     public function login_org(Request $request)
     {
         try {
-            $validateUser = Validator::make($request->all(),
-            [
+            $validateUser = Validator::make($request->all(), [
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
 
-            if($validateUser->fails()){
+            if ($validateUser->fails()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'validation error',
+                    'message' => 'Validation error',
                     'errors' => $validateUser->errors()
-                ],401);
-            }
-
-            if(!Auth::attempt($request->only(['email', 'password']))){
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Email & Password dose not match with our record.',
                 ], 401);
             }
 
-            $user = User::where(
-                'email' , $request->email,)->first();
+            $organization = Organization::where('email', $request->email)->first();
+
+            if (!$organization || !Hash::check($request->password, $organization->password)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid email or password.',
+                ], 401);
+            }
+
+            if (!$organization instanceof Organization) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User not found, cannot generate token',
+                ], 500);
+            }
+
+            $token = $organization->createToken("API TOKEN")->plainTextToken;
+
 
             return response()->json([
                 'status' => true,
-                'message' => 'User_Org Logged In Successfully ',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
-
+                'message' => 'Organization Logged In Successfully',
+                'organization' => [
+                    'id' => $organization->organization_id,
+                    'name' => $organization->name,
+                    'email' => $organization->email,
+                    'location' => $organization->location,
+                ],
+                'token' => $token
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => $th->getMessage()
-            ],500);
+                'message' => 'Login failed',
+                'error' => $th->getMessage()
+            ], 500);
         }
     }
-    public function logout(Request $request){
 
-        $request->user()->currentAccessToken()->delete();
+    public function logout(Request $request)
+    {
+        $request->user()->tokens()->delete();
         return response()->json([
             'status' => true,
-            'message' => 'User Logged out Successfully ',
-
+            'message' => 'User Logged out Successfully',
         ], 200);
     }
 }

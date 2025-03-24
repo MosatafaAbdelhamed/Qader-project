@@ -7,22 +7,18 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Organization extends Authenticatable
+class Volunteer extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-
-    protected $table = 'organizations';
-    protected $primaryKey = 'organization_id';
+    protected $primaryKey = 'volunteer_id';
 
     protected $fillable = [
         'name',
         'email',
-        'location',
+        'phone_number',
         'password',
     ];
-
-    public $timestamps = true;
 
     protected $hidden = [
         'password',

@@ -10,12 +10,12 @@ class CategoriesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    public function getCategories()
     {
-        $categories = Category::select('id', 'name')->get();
+        $categories = Category::select('category_id', 'name')->get();
         return response()->json(['categories' => $categories], 200);
     }
-
     /**
      * Store a newly created resource in storage.
      */

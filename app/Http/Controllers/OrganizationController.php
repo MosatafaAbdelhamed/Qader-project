@@ -9,10 +9,9 @@ use App\Models\Organization;
 class OrganizationController extends Controller
 {
 
-    //
     public function index()
     {
-        $organizations = Organization::select('id', 'name', 'location', 'description')->get();
+        $organizations = Organization::select('organization_id', 'name', 'location')->paginate(10);
         return response()->json(['organizations' => $organizations], 200);
     }
 
@@ -21,31 +20,17 @@ class OrganizationController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
-            'description' => 'nullable|string',
+
         ]);
 
         $organization = Organization::create($data);
         return response()->json(['message' => 'Organization created successfully', 'organization' => $organization], 201);
     }
 
-    /**
-     * عرض مؤسسة معينة عبر ID.
-     */
-    public function show($id)
-    {
-        $organization = Organization::find($id);
-        if (!$organization) {
-            return response()->json(['message' => 'Organization not found'], 404);
-        }
-        return response()->json(['organization' => $organization], 200);
-    }
 
-    /**
-     * تحديث بيانات مؤسسة.
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, $organization_id)
     {
-        $organization = Organization::find($id);
+        $organization = Organization::find($organization_id);
         if (!$organization) {
             return response()->json(['message' => 'Organization not found'], 404);
         }
@@ -53,7 +38,7 @@ class OrganizationController extends Controller
         $data = $request->validate([
             'name' => 'sometimes|string|max:255',
             'location' => 'sometimes|string|max:255',
-            'description' => 'nullable|string',
+
         ]);
 
         $organization->update($data);
@@ -63,9 +48,9 @@ class OrganizationController extends Controller
     /**
      * حذف مؤسسة.
      */
-    public function destroy($id)
+    public function destroy($organization_id)
     {
-        $organization = Organization::find($id);
+        $organization = Organization::find($organization_id);
         if (!$organization) {
             return response()->json(['message' => 'Organization not found'], 404);
         }
@@ -73,4 +58,19 @@ class OrganizationController extends Controller
         $organization->delete();
         return response()->json(['message' => 'Organization deleted successfully'], 200);
     }
+
+    public function search(Request $request)
+{
+    $query = Organization::query();
+
+    if ($request->has('keyword')) {
+        $query->where('name', 'LIKE', '%' . $request->keyword . '%')
+              ->orWhere('location', 'LIKE', '%' . $request->keyword . '%');
+    }
+
+    $organizations = $query->select('organization_id', 'name', 'location')->paginate(10);
+
+    return response()->json($organizations, 200);
+}
+
 }

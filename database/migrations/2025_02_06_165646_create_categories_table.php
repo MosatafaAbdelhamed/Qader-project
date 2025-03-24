@@ -13,8 +13,8 @@ return new class extends Migration
     {
         if (!Schema::hasTable('categories')) {
             Schema::create('categories', function (Blueprint $table) {
-                $table->id();
-                $table->string('name')->unique();
+                $table->id('category_id');
+                $table->string('name');
                 $table->timestamps();
             });
         }

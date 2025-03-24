@@ -13,10 +13,15 @@ return new class extends Migration
     {
         if (!Schema::hasTable('opportunities')) {
             Schema::create('opportunities', function (Blueprint $table) {
-                $table->id();
+                $table->id('opportunity_id');
                 $table->string('title');
-                $table->text('description');
-                $table->foreignId('category_id')->constrained('categories'); // ربط الفرصة بالفئة
+                $table->text('description')->nullable();
+                $table->date('start')->nullable();
+                $table->date('end')->nullable();
+                $table->unsignedBigInteger('category_id');
+                $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('cascade');
+                $table->unsignedBigInteger('organization_id');
+                $table->foreign('organization_id')->references('organization_id')->on('organizations')->onDelete('cascade');
                 $table->timestamps();
             });
         }

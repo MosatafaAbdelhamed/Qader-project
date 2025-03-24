@@ -1,82 +1,81 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
-use App\Mail\ResetPasswordLink;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password as RulesPassword;
+use Illuminate\Validation\ValidationException;
+
 
 class PasswordResetController extends Controller
 {
-    //
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:sanctum');
-
-    // }
-
-    public function sendResetLinkEmail(LinkEmailRequest $request)
+    public function forgotPassword(Request $request)
     {
-
         $request->validate([
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email',
         ]);
 
-
-        $url = URL::temporarySignedRoute(
-            'password.reset',
-            now()->addMinutes(30),
-            ['email' => $request->email]
+        $status = Password::sendResetLink(
+            $request->only('email')
         );
 
-
-        $url = str_replace(env('APP_URL'), env('FRONTEND_URL'), $url);
-
-
-        Mail::to($request->email)->send(new ResetPasswordLink($url));
-
-        return response()->json([
-            'message' => 'Reset Password link sent to your email'
-        ]);
-
-    }
-
-
-    public function reset(ResetPasswordRequest $request)
-    {
-        $user = User::whereEmail($request->email)->first();
-
-        if (!$user){
-            return response()->json([
-                'message' => 'User not found'
-            ], 404);
+        if ($status == Password::RESET_LINK_SENT) {
+            return [
+                'status' => __($status)
+            ];
         }
 
-        $user->password = bcrypt($request->password);
-        $user->save();
-
-        return response()->json([
-            'message' => 'Password reset successfully'
-        ],200);
+        throw ValidationException::withMessages([
+            'email' => [trans($status)],
+        ]);
     }
+
+    public function reset(Request $request ,$token )
+    {
+
+
+        $validator = Validator::make($request->all(),[
+
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', RulesPassword::defaults()],
+        ]);
+
+        if ($validator->fails()) {
+            return $validator->messages();
+        } else {
+
+            $status = Password::reset(
+                [
+                    'email' => $request->email,
+                    'password' => $request->password,
+                    'password_confirmation' => $request->password_confirmation,
+                    'token' => $token,
+                ],
+                function ($user) use ($request) {
+                    $user->forceFill([
+                        'password' => Hash::make($request->password),
+                        'remember_token' => Str::random(60),
+                    ])->save();
+
+                    $user->tokens()->delete();
+                    event(new PasswordReset($user));
+                }
+            );
+
+            return $status === Password::PASSWORD_RESET
+                ? response()->json(['message' => 'Password reset successfully'])
+                : response()->json(['message' => __($status)], 500);
+        }
+    }
+
+
+
+
 
 }
 
-
-
-
-
-// $url = \URL::tenporarySignedRoute(name: 'password.reset', now()->addMinute(30),['email' => $request->email]);
-
-//         ($url) = str_replace(env(key: 'APP_URL'), env(key: 'FRONTEND_URL'), $url);
-
-//         // dd($url);
-
-//         Mail::to($request->email)->send(new ResetPasswordLink());
-
-
-//         return response()->json([
-//             'message' => 'Reset Password link sent on your email'
-//         ]);

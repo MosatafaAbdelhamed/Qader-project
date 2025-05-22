@@ -19,6 +19,8 @@ class Organization extends Authenticatable
         'name',
         'email',
         'location',
+        'img',
+        'phone',
         'password',
     ];
 

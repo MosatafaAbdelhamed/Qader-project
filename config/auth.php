@@ -45,7 +45,20 @@ return [
         'driver' => 'sanctum',
         'provider' => 'users',
         ],
+
+        'volunteer' => [
+        'driver' => 'sanctum',
+        'provider' => 'volunteers',
+        ],
+
+        'organization' => [
+        'driver' => 'sanctum',
+        'provider' => 'organizations',
     ],
+
+    ],
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -69,6 +82,17 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+
+        'volunteers' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Volunteer::class,
+        ],
+
+        'organizations' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\Organization::class,
+        ],
+
 
         // 'users' => [
         //     'driver' => 'database',

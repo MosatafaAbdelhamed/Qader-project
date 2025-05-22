@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Application;
 
 class Opportunity extends Model
 {
@@ -23,6 +24,11 @@ class Opportunity extends Model
 
     public function organization()
     {
-        return $this->belongsTo(Organization::class, 'organization_id', 'organization_id');
+    return $this->belongsTo(Organization::class, 'organization_id', 'organization_id');
+    }
+
+    public function applications()
+    {
+    return $this->hasMany(Application::class, 'opportunity_id', 'opportunity_id');
     }
 }

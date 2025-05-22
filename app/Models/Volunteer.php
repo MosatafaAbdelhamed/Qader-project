@@ -18,9 +18,16 @@ class Volunteer extends Authenticatable
         'email',
         'phone_number',
         'password',
+        'img',
     ];
 
     protected $hidden = [
         'password',
     ];
+
+    public function applications()
+    {
+    return $this->hasMany(\App\Models\Application::class, 'volunteer_id');
+    }
+
 }

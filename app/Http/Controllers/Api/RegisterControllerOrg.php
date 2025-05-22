@@ -18,7 +18,18 @@ class RegisterControllerOrg extends Controller
                 'email' => 'required|email|unique:organizations,email',
                 'password' => 'required|min:8',
                 'location' => 'required|string|max:255',
+                'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'phone' => 'required|regex:/^01[0-9]{9}$/',
             ]);
+
+            $imgPath = null;
+
+if ($request->hasFile('img')) {
+    $file = $request->file('img');
+    $filename = time() . '_' . $file->getClientOriginalName();
+    $file->move(public_path('uploads/organizations'), $filename);
+    $imgPath = 'uploads/organizations/' . $filename;
+}
 
             if ($validateUser->fails()) {
                 return response()->json([
@@ -33,6 +44,8 @@ class RegisterControllerOrg extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'location' => $request->location,
+                'phone' => $request->phone,
+                'img' => $imgPath,
             ]);
 
             return response()->json([
@@ -43,6 +56,7 @@ class RegisterControllerOrg extends Controller
                     'name' => $organization->name,
                     'email' => $organization->email,
                     'location' => $organization->location,
+                    'phone' => $organization->phone,
                 ],
                 'token' => $organization->createToken("API TOKEN")->plainTextToken
             ], 201);

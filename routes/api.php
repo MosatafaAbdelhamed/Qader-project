@@ -15,6 +15,13 @@ use App\Http\Controllers\OpportunitiesController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\OrganizationController;
 
+use App\Http\Controllers\OrganizationProfileController;
+use App\Http\Controllers\VolunteerProfileController;
+
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\VolunteerNotificationController;
+
+
 
 
 Route::get('test' , [\App\Http\Controllers\TestApiController::class,'test']);
@@ -39,6 +46,33 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/organizations/search', [OrganizationController::class, 'search']);
 });
 
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/organization/profile', [OrganizationProfileController::class, 'show']);
+    Route::patch('/organization/profile', [OrganizationProfileController::class, 'update']);
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/volunteer/profile', [VolunteerProfileController::class, 'show']);
+    Route::patch('/volunteer/profile', [VolunteerProfileController::class, 'update']);
+});
+//تسجيل على الفرصه
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/opportunities/{opportunity_id}/apply', [ApplicationController::class, 'apply']);
+});
+// تعديل حاله الطلب من قبل المؤسسه
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::put('applications/{id}/status', [ApplicationController::class, 'updateStatus']);
+});
+
+//  إشعارات المؤسسة
+Route::middleware('auth:sanctum')->get('/organization/notifications', function () {
+    $organization = auth()->user();
+
+    return $organization->notifications;
+});
+// إشعارات المتطوع
+Route::middleware('auth:sanctum')->get('/volunteer/notifications', [VolunteerNotificationController::class, 'index']);
 
 
 Route::middleware('auth:sanctum')->group(function () {

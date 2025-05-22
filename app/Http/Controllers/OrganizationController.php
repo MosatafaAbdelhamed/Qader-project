@@ -20,6 +20,7 @@ class OrganizationController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'img' => 'nullable|string|max:255',
 
         ]);
 
@@ -65,12 +66,21 @@ class OrganizationController extends Controller
 
     if ($request->has('keyword')) {
         $query->where('name', 'LIKE', '%' . $request->keyword . '%')
-              ->orWhere('location', 'LIKE', '%' . $request->keyword . '%');
+            ->orWhere('location', 'LIKE', '%' . $request->keyword . '%');
     }
 
     $organizations = $query->select('organization_id', 'name', 'location')->paginate(10);
 
     return response()->json($organizations, 200);
 }
+    public function notifications()
+    {
+
+    $notifications = auth()->user()->notifications;
+
+    return response()->json([
+    'notifications' => $notifications
+    ]);
+    }
 
 }

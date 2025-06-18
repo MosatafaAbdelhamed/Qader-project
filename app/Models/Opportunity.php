@@ -24,7 +24,7 @@ class Opportunity extends Model
 
     public function organization()
     {
-    return $this->belongsTo(Organization::class, 'organization_id', 'organization_id');
+    return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     public function applications()

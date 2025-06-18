@@ -11,8 +11,35 @@ class VolunteerNotificationController extends Controller
     {
         $volunteer = auth('volunteer')->user();
 
-        $notifications = $volunteer->notifications()->orderBy('created_at', 'desc')->get();
+        $notifications = $volunteer->notifications()
+    ->orderBy('created_at', 'desc')
+    ->get()
+    ->map(function ($notification) {
+        return [
+            'id' => $notification->id,
+            'type' => $notification->type,
+            'data' => $notification->data,
+            'read_at' => $notification->read_at,
+            'created_at' => $notification->created_at,
+            'is_read' => $notification->read_at !== null,
+        ];
+    });
 
-        return response()->json(['notifications' => $notifications]);
+return response()->json(['notifications' => $notifications]);
+}
+public function markAsRead($id)
+{
+    $user = auth()->user();
+
+    $notification = $user->notifications()->where('id', $id)->first();
+
+    if (!$notification) {
+        return response()->json(['message' => 'Notification not found'], 404);
     }
+
+    $notification->markAsRead();
+
+    return response()->json(['message' => 'Notification marked as read']);
+}
+
 }

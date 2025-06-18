@@ -88,4 +88,22 @@ $volunteer = Volunteer::find($authUser->volunteer_id);
         'application' => $application,
     ]);
 }
+public function myApplications()
+{
+    $authUser = Auth::user();
+
+    if (!$authUser || !($authUser instanceof Volunteer)) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $applications = Application::where('volunteer_id', $authUser->volunteer_id)
+        ->with(['opportunity.category', 'opportunity.organization'])
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+
+    return response()->json([
+        'applications' => $applications
+    ], 200);
+}
+
 }

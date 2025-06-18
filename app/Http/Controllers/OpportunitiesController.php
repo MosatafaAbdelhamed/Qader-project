@@ -108,44 +108,43 @@ class OpportunitiesController extends Controller
 
     public function search(Request $request)
     {
-        $query = Opportunity::query();
+    $query = Opportunity::with(['category', 'organization']);
 
-        if ($request->has('category_id')) {
+    if ($request->has('category_id')) {
         $query->where('category_id', $request->category_id);
-        }
+    }
 
-        if ($request->has('title')) {
-            $query->where('title', 'LIKE', '%' . $request->title . '%');
-        }
+    if ($request->has('title')) {
+        $query->where('title', 'LIKE', '%' . $request->title . '%');
+    }
 
-        if ($request->has('start')) {
-            $query->whereDate('start', $request->start);
-        }
+    if ($request->has('start')) {
+        $query->whereDate('start', $request->start);
+    }
 
+    if ($request->has('keyword')) {
+        $keyword = $request->keyword;
 
-        // if ($request->has('available_seats')) {
-        //     $query->where('available_seats', '>=', $request->available_seats);
-        // }
-
-        if ($request->has('sort_by')) {
-            $sortBy = $request->sort_by;
-            $sortOrder = $request->get('sort_order', 'asc');
-
-            $validColumns = ['title', 'start', 'available_seats', 'created_at'];
-            if (in_array($sortBy, $validColumns)) {
-                $query->orderBy($sortBy, $sortOrder);
-            }
-        }
-
-        if ($request->has('keyword')) {
-        $query->where(function ($q) use ($request) {
-            $q->where('title', 'LIKE', '%' . $request->keyword . '%')
-            ->orWhere('description', 'LIKE', '%' . $request->keyword . '%');
+        $query->where(function ($q) use ($keyword) {
+            $q->where('title', 'LIKE', "%{$keyword}%")
+              ->orWhere('description', 'LIKE', "%{$keyword}%")
+              ->orWhereHas('organization', function ($orgQuery) use ($keyword) {
+                  $orgQuery->where('location', 'LIKE', "%{$keyword}%");
+              });
         });
     }
 
+    if ($request->has('sort_by')) {
+        $sortBy = $request->sort_by;
+        $sortOrder = $request->get('sort_order', 'asc');
 
-    $opportunities = $query->with(['category', 'organization'])->paginate(10);
+        $validColumns = ['title', 'start', 'available_seats', 'created_at'];
+        if (in_array($sortBy, $validColumns)) {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+    }
+
+    $opportunities = $query->paginate(10);
 
     return response()->json($opportunities, 200);
 }

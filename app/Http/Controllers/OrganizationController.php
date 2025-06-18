@@ -11,7 +11,7 @@ class OrganizationController extends Controller
 
     public function index()
     {
-        $organizations = Organization::select('organization_id', 'name', 'location')->paginate(10);
+        $organizations = Organization::select('organization_id', 'name', 'location','phone')->paginate(10);
         return response()->json(['organizations' => $organizations], 200);
     }
 

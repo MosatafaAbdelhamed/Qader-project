@@ -24,14 +24,38 @@ class OrganizationProfileController extends Controller
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+
         if ($request->hasFile('img')) {
-            $file = $request->file('img');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/organizations'), $filename);
-            $data['img'] = 'uploads/organizations/' . $filename;
+        $file = $request->file('img');
+
+        if (!$file->isValid()) {
+            return response()->json(['error' => 'الملف غير صالح'], 422);
         }
 
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $destinationPath = public_path('uploads/organizations');
+
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0775, true);
+        }
+
+        try {
+            $file->move($destinationPath, $filename);
+            $data['img'] = 'uploads/organizations/' . $filename;
+        } catch (\Exception $e) {
+            return response()->json([
+            'error' => 'فشل في رفع الصورة',
+            'details' => $e->getMessage()
+        ], 500);
+        }
+    }
+
         $organization->update($data);
+
+        if ($organization->img) {
+        $organization->img = asset($organization->img);
+        }
+
 
         return response()->json([
             'message' => 'Profile updated successfully',
@@ -46,6 +70,10 @@ class OrganizationProfileController extends Controller
         if (!$organization || !($organization instanceof Organization)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        if ($organization->img) {
+        $organization->img = asset($organization->img);
+        }
+
 
         return response()->json($organization, 200);
     }

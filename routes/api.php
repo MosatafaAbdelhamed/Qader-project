@@ -20,6 +20,8 @@ use App\Http\Controllers\VolunteerProfileController;
 
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\VolunteerNotificationController;
+use App\Http\Controllers\OrganizationNotificationController;
+
 
 
 
@@ -48,14 +50,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/organization/profile', [OrganizationProfileController::class, 'show']);
-    Route::patch('/organization/profile', [OrganizationProfileController::class, 'update']);
+    Route::get('/organization/profile/show', [OrganizationProfileController::class, 'show']);
+    Route::patch('/organization/profile/update', [OrganizationProfileController::class, 'update']);
+    Route::post('/organization/profile/update-image', [OrganizationProfileController::class, 'update']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/volunteer/profile', [VolunteerProfileController::class, 'show']);
-    Route::patch('/volunteer/profile', [VolunteerProfileController::class, 'update']);
+    Route::get('/volunteer/profile/show', [VolunteerProfileController::class, 'show']);
+    Route::patch('/volunteer/profile/update', [VolunteerProfileController::class, 'update']);
+    Route::post('/volunteer/profile/update-image', [VolunteerProfileController::class, 'update']);
+
 });
+//عرض الفرص اللى المتطوع قدم عليها
+Route::middleware('auth:sanctum')->get('/volunteer/applications', [ApplicationController::class, 'myApplications']);
+
 //تسجيل على الفرصه
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/opportunities/{opportunity_id}/apply', [ApplicationController::class, 'apply']);
@@ -71,8 +79,12 @@ Route::middleware('auth:sanctum')->get('/organization/notifications', function (
 
     return $organization->notifications;
 });
+
+Route::middleware('auth:sanctum')->post('/organization/notifications/{id}/read', [OrganizationNotificationController::class, 'markAsRead']);
+
 // إشعارات المتطوع
 Route::middleware('auth:sanctum')->get('/volunteer/notifications', [VolunteerNotificationController::class, 'index']);
+Route::middleware('auth:sanctum')->post('/volunteer/notifications/{id}/read', [VolunteerNotificationController::class, 'markAsRead']);
 
 
 Route::middleware('auth:sanctum')->group(function () {

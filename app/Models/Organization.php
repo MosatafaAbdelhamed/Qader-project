@@ -29,4 +29,15 @@ class Organization extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'organization_id');
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating');
+    }
+
 }

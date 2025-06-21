@@ -11,7 +11,9 @@ class OrganizationController extends Controller
 
     public function index()
     {
-        $organizations = Organization::select('organization_id', 'name', 'location','phone')->paginate(10);
+        $organizations = Organization::select('organization_id', 'name', 'location','phone')
+        ->withAvg('reviews as average_rating', 'rating')
+        ->paginate(10);
         return response()->json(['organizations' => $organizations], 200);
     }
 
@@ -69,7 +71,9 @@ class OrganizationController extends Controller
             ->orWhere('location', 'LIKE', '%' . $request->keyword . '%');
     }
 
-    $organizations = $query->select('organization_id', 'name', 'location')->paginate(10);
+    $organizations = $query->select('organization_id', 'name', 'location')
+    ->withAvg('reviews as average_rating', 'rating')
+    ->paginate(10);
 
     return response()->json($organizations, 200);
 }

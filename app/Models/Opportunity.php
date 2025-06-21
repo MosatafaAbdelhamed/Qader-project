@@ -31,4 +31,9 @@ class Opportunity extends Model
     {
     return $this->hasMany(Application::class, 'opportunity_id', 'opportunity_id');
     }
+    public function reports()
+    {
+    return $this->hasMany(Report::class, 'opportunity_id');
+    }
+
 }

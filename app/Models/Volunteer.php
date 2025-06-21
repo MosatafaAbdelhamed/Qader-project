@@ -30,4 +30,10 @@ class Volunteer extends Authenticatable
     return $this->hasMany(\App\Models\Application::class, 'volunteer_id');
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'volunteer_id');
+    }
+
+
 }

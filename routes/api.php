@@ -22,7 +22,8 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\VolunteerNotificationController;
 use App\Http\Controllers\OrganizationNotificationController;
 
-
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReportController;
 
 
 
@@ -93,6 +94,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/opportunities/{opportunity_id}', [OpportunitiesController::class, 'update']);
     Route::delete('/opportunities/{opportunity_id}', [OpportunitiesController::class, 'destroy']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/reviews', [ReviewController::class, 'store']);
+});
+
+Route::middleware('auth:sanctum')->post('/reports/create', [ReportController::class, 'store']);
+
+Route::get('/reports/show', [ReportController::class, 'index']);
+
+
 
 //new updata
 Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);

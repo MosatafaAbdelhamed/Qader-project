@@ -4,29 +4,36 @@ namespace App\Http\Controllers;
 
 use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
+
+
 
 class OrganizationNotificationController extends Controller
 {
     public function index(Request $request)
-    {
-        $organization = auth('organization')->user();
+{
+    $organization = auth('organization')->user();
 
-        $notifications = $organization->notifications()
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function (DatabaseNotification $notification) {
-                return [
-                    'id' => $notification->id,
-                    'type' => $notification->type,
-                    'data' => $notification->data,
-                    'read_at' => $notification->read_at,
-                    'created_at' => $notification->created_at,
-                    'is_read' => $notification->read_at !== null,
-                ];
-            });
+    $allNotifications = $organization->notifications()
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        return response()->json(['notifications' => $notifications]);
-    }
+    $notifications = $allNotifications->map(function ($notification) {
+        return [
+            'id' => $notification->id,
+            'type' => $notification->type,
+            'data' => $notification->data,
+            'read_at' => $notification->read_at,
+            'created_at' => $notification->created_at,
+            'is_read' => $notification->read_at !== null,
+        ];
+    });
+
+    return response()->json([
+        'notifications' => $notifications,
+        'unread_count' => $organization->unreadNotifications->count(),
+    ]);
+}
 
     public function markAsRead($id)
     {

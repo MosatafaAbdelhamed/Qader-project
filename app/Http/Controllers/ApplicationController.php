@@ -52,7 +52,7 @@ $volunteer = Volunteer::find($authUser->volunteer_id);
 
 
         $organization = Organization::findOrFail($opportunity->organization_id);
-        $organization->notify(new NewVolunteerApplication($volunteer, $opportunity));
+        $organization->notify(new NewVolunteerApplication($application,$volunteer, $opportunity));
 
         return response()->json([
             'message' => 'Application submitted successfully',

@@ -75,12 +75,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 //  إشعارات المؤسسة
-Route::middleware('auth:sanctum')->get('/organization/notifications', function () {
-    $organization = auth()->user();
-
-    return $organization->notifications;
-});
-
+Route::middleware('auth:sanctum')->get('/organization/notifications', [OrganizationNotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/organization/notifications/{id}/read', [OrganizationNotificationController::class, 'markAsRead']);
 
 // إشعارات المتطوع

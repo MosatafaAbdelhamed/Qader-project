@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
+
 
 class VolunteerNotificationController extends Controller
 {
@@ -11,10 +13,10 @@ class VolunteerNotificationController extends Controller
     {
         $volunteer = auth('volunteer')->user();
 
-        $notifications = $volunteer->notifications()
+        $allNotifications = $volunteer->notifications()
     ->orderBy('created_at', 'desc')
-    ->get()
-    ->map(function ($notification) {
+    ->get();
+    $notifications = $allNotifications->map(function (DatabaseNotification $notification) {
         return [
             'id' => $notification->id,
             'type' => $notification->type,
@@ -25,7 +27,11 @@ class VolunteerNotificationController extends Controller
         ];
     });
 
-return response()->json(['notifications' => $notifications]);
+return response()->json([
+    'notifications' => $notifications,
+    'unread_count' => $volunteer->unreadNotifications->count(),
+
+]);
 }
 public function markAsRead($id)
 {

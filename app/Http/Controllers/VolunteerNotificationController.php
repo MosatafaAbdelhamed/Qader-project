@@ -13,10 +13,10 @@ class VolunteerNotificationController extends Controller
     {
         $volunteer = auth('volunteer')->user();
 
-        $allNotifications = $volunteer->notifications()
+        $notifications = $volunteer->notifications()
     ->orderBy('created_at', 'desc')
-    ->get();
-    $notifications = $allNotifications->map(function (DatabaseNotification $notification) {
+    ->get()
+    ->map(function (DatabaseNotification $notification) {
         return [
             'id' => $notification->id,
             'type' => $notification->type,
@@ -29,7 +29,6 @@ class VolunteerNotificationController extends Controller
 
 return response()->json([
     'notifications' => $notifications,
-    'unread_count' => $volunteer->unreadNotifications->count(),
 
 ]);
 }

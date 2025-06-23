@@ -14,11 +14,10 @@ class OrganizationNotificationController extends Controller
 {
     $organization = auth('organization')->user();
 
-    $allNotifications = $organization->notifications()
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    $notifications = $allNotifications->map(function ($notification) {
+    $notifications = $organization->notifications()
+    ->orderBy('created_at', 'desc')
+    ->get()
+    ->map(function ($notification) {
         return [
             'id' => $notification->id,
             'type' => $notification->type,
@@ -28,10 +27,8 @@ class OrganizationNotificationController extends Controller
             'is_read' => $notification->read_at !== null,
         ];
     });
-
     return response()->json([
         'notifications' => $notifications,
-        'unread_count' => $organization->unreadNotifications->count(),
     ]);
 }
 

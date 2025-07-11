@@ -24,10 +24,11 @@ use App\Http\Controllers\OrganizationNotificationController;
 
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\EmailVerificationController;
 
 
-
-Route::get('test' , [\App\Http\Controllers\TestApiController::class,'test']);
+// Route::get('/home', [HomeController::class, 'index']);
+// Route::get('test' , [\App\Http\Controllers\TestApiController::class,'test']);
 
 Route::post('/register/organization' , [RegisterControllerOrg::class,'register']);
 Route::post('/login/organization' , [LoginControllerOrg::class,'login_org']);
@@ -38,12 +39,15 @@ Route::post('/login/volunteer' , [LoginControllerVol::class,'login_vol']);
 Route::post('/logout' , [LoginControllerVol::class,'logout'])->middleware('auth:sanctum');
 
 
-Route::get('/home', [HomeController::class, 'index']);
+
 Route::get('/categories', [CategoriesController::class, 'getCategories']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/opportunities', [OpportunitiesController::class, 'index']);
     Route::get('/search-opportunities', [OpportunitiesController::class, 'search']);
+    Route::get('/opportunities/clusters', [OpportunitiesController::class, 'getClusters']);
+    Route::get('/opportunities/cluster/{cluster}', [OpportunitiesController::class, 'searchByCluster']);
+    Route::get('/opportunities/cluster-summary', [OpportunitiesController::class, 'getClusterSummary']);
     //
     Route::get('/organizations', [OrganizationController::class, 'index']);
     Route::get('/organizations/search', [OrganizationController::class, 'search']);
@@ -62,23 +66,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/volunteer/profile/update-image', [VolunteerProfileController::class, 'update']);
 
 });
-//عرض الفرص اللى المتطوع قدم عليها
+
 Route::middleware('auth:sanctum')->get('/volunteer/applications', [ApplicationController::class, 'myApplications']);
 
-//تسجيل على الفرصه
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/opportunities/{opportunity_id}/apply', [ApplicationController::class, 'apply']);
 });
-// تعديل حاله الطلب من قبل المؤسسه
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('applications/{id}/status', [ApplicationController::class, 'updateStatus']);
 });
 
-//  إشعارات المؤسسة
+
 Route::middleware('auth:sanctum')->get('/organization/notifications', [OrganizationNotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/organization/notifications/{id}/read', [OrganizationNotificationController::class, 'markAsRead']);
 
-// إشعارات المتطوع
+
 Route::middleware('auth:sanctum')->get('/volunteer/notifications', [VolunteerNotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/volunteer/notifications/{id}/read', [VolunteerNotificationController::class, 'markAsRead']);
 
@@ -100,12 +104,13 @@ Route::get('/reports/show', [ReportController::class, 'index']);
 
 
 
-//new updata
-Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);
-Route::post('reset-password/{token}', [PasswordResetController::class, 'reset'])->middleware('guest')->name('password.update');
 
-Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('auth:sanctum');
-Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify')->middleware('auth:sanctum');
+Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('reset-password/{user_type}/{token}', [PasswordResetController::class, 'reset']);
+
+
+Route::post('email/verification-notification', [\App\Http\Controllers\Api\EmailVerificationController::class, 'sendVerificationEmail'])->middleware('auth:sanctum');
+Route::get('verify-email/{id}/{hash}', [\App\Http\Controllers\Api\EmailVerificationController::class, 'verify'])->name('verification.verify')->middleware('auth:sanctum');
 
 
 

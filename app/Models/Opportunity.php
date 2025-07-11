@@ -13,7 +13,7 @@ class Opportunity extends Model
     protected $table = 'opportunities';
     protected $primaryKey = 'opportunity_id';
 
-    protected $fillable = ['title', 'description', 'category_id', 'organization_id', 'start', 'end'];
+    protected $fillable = ['title', 'description', 'category_id', 'organization_id', 'start', 'end', 'hours'];
 
     public $timestamps = true;
 

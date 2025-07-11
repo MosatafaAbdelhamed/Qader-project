@@ -16,5 +16,9 @@ class DatabaseSeeder extends Seeder
             OrganizationSeeder::class,
             OpportunitySeeder::class,
         ]);
+
+        $this->call(Organization1Seeder::class);
+        $this->call(ComprehensiveOpportunitySeeder::class);
+        $this->call(NewOrganizationsOpportunitiesSeeder::class);
     }
 }

@@ -126,6 +126,19 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        'volunteers' => [
+        'provider' => 'volunteers',
+        'table' => 'password_reset_tokens',
+        'expire' => 60,
+        'throttle' => 60,
+    ],
+
+    'organizations' => [
+        'provider' => 'organizations',
+        'table' => 'password_reset_tokens',
+        'expire' => 60,
+        'throttle' => 60,
+    ],
     ],
 
     /*
